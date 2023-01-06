@@ -1,1 +1,1 @@
-from kivy_resource import *
+from kivymd_reload_async import *

@@ -1,5 +1,5 @@
 import os
-from kivy_resource.apputils import fetch
+from kivymd_reload_async.apputils import fetch
 from kivymd.app import MDApp
 
 class RestClient():
