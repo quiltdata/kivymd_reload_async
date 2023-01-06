@@ -1,0 +1,28 @@
+# Global UI layout dimensions
+#:import Window kivy.core.window.Window
+#:set screen_size (Window.size[0]**2 + Window.size[1]**2)**0.5
+#:set large_font screen_size * 0.04
+#:set normal_font screen_size * 0.02
+#:set rel_space screen_size * 0.01
+#:set list_space screen_size * 0.005
+#:set widget_elevation dp(8)
+
+#:import LoginScreen kivy_resource.LoginScreen
+#:import ResourceEdit kivy_resource.ResourceEdit
+#:import ResourceList kivy_resource.ResourceList
+
+<SM>:
+    ResourceList:
+        name: 'resources'
+    ResourceEdit:
+        name: 'edit'
+    LoginScreen:
+        name: 'login'
+    AboutScreen:
+        name: 'about'
+
+
+<MenuItem>:
+    IconLeftWidgetWithoutTouch:
+        icon: root.icon
+        pos_hint: {"center_y": .5}
