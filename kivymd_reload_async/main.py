@@ -1,4 +1,5 @@
 import os
+import trio
 
 from kivy.uix.screenmanager import RiseInTransition, FallOutTransition, SlideTransition, ScreenManager
 # from kivymd.app import MDApp
@@ -197,7 +198,16 @@ class MainApp(MDApp):
     def is_auth(self):
         return self.session_cookie is not None
 
+    async def async_trio(self):
+        async with trio.open_nursery() as nursery:
+            self.nursery = nursery
+            async def run_wrapper():
+                print('App start')
+                await self.async_run(async_lib='trio')
+                print('App done')
+                nursery.cancel_scope.cancel()
+            nursery.start_soon(run_wrapper)
 
 if __name__ == '__main__':
     app = MainApp()
-    app.run()
+    trio.run(app.async_trio)
