@@ -150,7 +150,6 @@ class MainApp(MDApp):
         else:
             self.menu.add_item(id="logout", text="Logout", icon="logout", on_release=self.sm.get_screen('login').logout)
 
-        self.sm.get_screen('resources').list_resources()
 
         return self.sm
 
@@ -163,8 +162,15 @@ class MainApp(MDApp):
             self.sm.get_screen('edit').ids.title.text = state['edit_title']
             self.sm.get_screen('edit').ids.author.text = state['edit_author']
 
-    def on_start(self):
-        self.sm.get_screen('resources').open()
+    def on_start(self): 
+        print("on_start")
+        self.nursery.start_soon(self.open_resources)
+
+    async def open_resources(self):
+        print("open_resources")
+        resource_screen = self.sm.get_screen('resources')
+        resource_screen.open()
+        await resource_screen.list_resources()
 
     def keyboard_hook(self, key, scancode, codepoint, modifier, *args):
         if scancode == 27:  # ESC
@@ -201,12 +207,12 @@ class MainApp(MDApp):
     async def async_trio(self):
         async with trio.open_nursery() as nursery:
             self.nursery = nursery
-            async def run_wrapper():
+            async def run_app():
                 print('App start')
                 await self.async_run(async_lib='trio')
                 print('App done')
                 nursery.cancel_scope.cancel()
-            nursery.start_soon(run_wrapper)
+            nursery.start_soon(run_app)
 
 if __name__ == '__main__':
     app = MainApp()

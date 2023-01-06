@@ -66,7 +66,7 @@ class ResourceList(MDScreen):
         app = MDApp.get_running_app()
         app.switch_screen('resources')
 
-    def list_resources(self):
+    async def list_resources(self):
         app = MDApp.get_running_app()
         app.menu.dismiss()
 
