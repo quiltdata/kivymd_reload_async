@@ -214,6 +214,9 @@ class MainApp(MDApp):
                 nursery.cancel_scope.cancel()
             nursery.start_soon(run_app)
 
-if __name__ == '__main__':
+def run():
     app = MainApp()
     trio.run(app.async_trio)
+
+if __name__ == '__main__':
+    run()
