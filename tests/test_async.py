@@ -35,7 +35,7 @@ def no_callback():
 def test_httpx():
 	with httpx.Client() as client:
 	    r = client.get(TEST_HOST)
-	print(dir(r))
+	#print(dir(r))
 	assert r.status_code == 200
 	assert r.url == TEST_HOST
 
@@ -47,11 +47,14 @@ async def test_call(monkeypatch):
     assert resp.status_code == 200
     assert str(resp.url) == TEST_HOST
 
-def test_client():
+async def test_client():
 	client = AsyncClient.Default()
 	assert client
 	assert client.keys
 	assert client.keys[0] == 'title'
+	resp = await client.get()
+	result = resp.text
+	assert isinstance(result,str)
 
 def test_client_extract():
 	client = AsyncClient.Default()

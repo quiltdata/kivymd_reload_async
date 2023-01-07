@@ -170,7 +170,7 @@ class MainApp(MDApp):
         print("open_resources")
         resource_screen = self.sm.get_screen('resources')
         resource_screen.open()
-        await resource_screen.list_resources()
+        await resource_screen.list_resources(self.nursery)
 
     def keyboard_hook(self, key, scancode, codepoint, modifier, *args):
         if scancode == 27:  # ESC
