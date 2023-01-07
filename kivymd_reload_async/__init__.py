@@ -5,4 +5,5 @@ from kivymd_reload_async.ResourceListScreen.resource_list_screen import Resource
 from kivymd_reload_async.ResourceListScreen.resource_list_screen import ResourceList
 from .apputils import load_kv, Notify, fetch
 from .client import RestClient
+from .asyncclient import AsyncClient
 from .main import MainApp
