@@ -1,5 +1,5 @@
 import os
-import threading
+import json
 
 from kivy.clock import mainthread, Clock
 from kivymd.uix.card import MDCardSwipe
@@ -9,8 +9,9 @@ from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivy.properties import NumericProperty, StringProperty
 
-from kivy_resource.apputils import Notify, load_kv
-from kivy_resource.client import RestClient
+from kivymd_reload_async.apputils import Notify, load_kv
+from kivymd_reload_async.client import RestClient
+from kivymd_reload_async.asyncclient import AsyncClient
 
 
 load_kv(__name__)
@@ -66,12 +67,14 @@ class ResourceList(MDScreen):
         app = MDApp.get_running_app()
         app.switch_screen('resources')
 
-    def list_resources(self):
+    async def list_resources(self, nursery=None):
         app = MDApp.get_running_app()
         app.menu.dismiss()
+        print('list_resources')
 
-        @mainthread
-        def _load_data(request, result):
+        async def _load_data(result_text):
+            print('_load_data')
+            result = json.loads(result_text)
             resource_data = result.get('books', None)
             if resource_data:
                 authorized = app.is_auth()
@@ -83,23 +86,27 @@ class ResourceList(MDScreen):
 
             self.ids.loading.active = False
 
-        @mainthread
-        def _clear_data():
+        async def _clear_data():
+            print('_clear_data')
             self.ids.loading.active = True
             self.ids.resourcelist.clear_widgets()
 
-        @mainthread
-        def _on_error(*args):
+        async def _on_error(*args):
             self.ids.loading.active = False
 
-        def _list_resources():
-            Clock.schedule_once(lambda dt: _clear_data(), 0)
+        async def _list_resources():
+            print('_list_resources')
+            await _clear_data()
+            print('_list_resources._clear_data')
+            response = await AsyncClient.Default().get()
+            print('_list_resources.response')
+            print(response)
+            await _load_data(response.text)
+            print('_list_resources._load_data')
 
-            rest_endpoint = os.environ['REST_ENDPOINT']
-            RestClient.Default().get(_load_data, on_error=_on_error)
+        nursery.start_soon(_list_resources)
 
-        threading.Thread(target=_list_resources).start()
-
+# TODO: ERROR HANDLING
 
 class Resource(MDCardSwipe):
     resource_id = NumericProperty()

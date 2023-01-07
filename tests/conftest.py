@@ -1,1 +1,2 @@
-from kivy_resource import *
+import trio
+from kivymd_reload_async import *

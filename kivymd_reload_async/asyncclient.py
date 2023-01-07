@@ -1,13 +1,14 @@
 import os
-from kivy_resource.apputils import fetch
+import httpx
+import trio
 from kivymd.app import MDApp
 
-class RestClient():
+class AsyncClient():
 
     def Default():
         resource = os.environ['REST_RESOURCE']
         keys = os.environ['REST_KEYS'].split(',')
-        return RestClient(resource, keys)
+        return AsyncClient(resource, keys)
 
     def __init__(self, resource, id_keys):
         self.resource = resource
@@ -23,39 +24,39 @@ class RestClient():
     def ids_text(self, ids):
         return {k: ids[k].text for k in self.keys}
 
-    def ping(self, callback):
+    async def ping(self):
         url = 'ping'
-        return self.call('GET', url, callback)
+        return await self.call('GET', url)
 
-    def login(self, callback, username, password):
+    async def login(self, username, password):
         options = {'username': username, 'password': password}
         url = 'login'
-        return self.call('POST', url, callback, options)
+        return await self.call('POST', url, options)
 
-    def logout(self, callback):
+    async def logout(self):
         url = 'logout'
-        return self.call('POST', url, callback)
+        return await self.call('POST', url)
 
-    def get(self, callback, resource_id=None, **kwargs):
+    async def get(self, resource_id=None, **kwargs):
         url = f"{self.resource}/{resource_id}" if resource_id else self.resource 
-        return self.call('GET', url, callback, kwargs)
+        return await self.call('GET', url, kwargs)
 
-    def post(self, callback, ids,**kwargs):
+    async def post(self, ids,**kwargs):
         options = self.ids_text(ids) | kwargs
         url = self.resource
-        return self.call('POST', url, callback, options)
+        return await self.call('POST', url, options)
 
-    def put(self, callback, ids, resource_id, **kwargs):
+    async def put(self, ids, resource_id, **kwargs):
         options = self.ids_text(ids) | kwargs
         options['id'] = resource_id
         url = f"{self.resource}/{resource_id}"
-        return self.call('PUT', url, callback, options)
+        return await self.call('PUT', url, options)
 
-    def delete(self, callback, resource_id, **kwargs):
+    async def delete(self, resource_id, **kwargs):
         url = f"{self.resource}/{resource_id}"
-        return self.call('DELETE', url, callback)
+        return await self.call('DELETE', url)
 
-    def call(self, method, route, callback, options=None):
+    def sync_call(self, method, route, options={}):
         endpoint = os.environ['REST_ENDPOINT']
         app = MDApp.get_running_app()
         url = f"{endpoint}/{route}"
@@ -64,4 +65,15 @@ class RestClient():
             'options': options,
             'cookie': app.session_cookie,
         } | options
-        return fetch(url, callback, **params)
+        return fetch(url, **params)
+
+    async def call(self, method, route, options={}):
+        endpoint = os.environ['REST_ENDPOINT']
+        app = MDApp.get_running_app()
+        url = f"{endpoint}/{route}" if len(route) > 0 else endpoint
+        print('url', url)
+        options['cookies'] = app.session_cookie
+        async with httpx.AsyncClient() as client:
+            response = await client.request(method, url, **options)
+            return response
+        return True

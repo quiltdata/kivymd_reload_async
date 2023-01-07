@@ -5,8 +5,8 @@ from kivymd.uix.screen import MDScreen
 from kivy.properties import NumericProperty
 from kivymd.app import MDApp
 
-from kivy_resource.apputils import Notify, load_kv
-from kivy_resource.client import RestClient
+from kivymd_reload_async.apputils import Notify, load_kv
+from kivymd_reload_async.client import RestClient
 
 load_kv(__name__)
 

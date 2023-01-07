@@ -3,8 +3,8 @@ import os
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 
-from kivy_resource.apputils import load_kv, Notify, fetch
-from kivy_resource.client import RestClient
+from kivymd_reload_async.apputils import load_kv, Notify, fetch
+from kivymd_reload_async.client import RestClient
 
 load_kv(__name__)
 
